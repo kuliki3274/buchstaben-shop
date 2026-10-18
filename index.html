@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buchstabenliebe – Namen fürs Kinderzimmer</title>
+<meta name="description" content="Gestalte die Buchstaben für das Kinderzimmer selbst: Name, Größe und Farben wählen, sicher bezahlen. Handgemacht im 3D-Druck.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF6F0; --card:#FFFFFF; --ink:#3B2F2A; --muted:#8A7B72;
+    --line:#EADFD4; --wall:#F1E7DC; --accent:#E8768A; --accent-ink:#fff;
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px}
+  header{padding:22px 0 6px;text-align:center}
+  .logo{font-family:Fredoka,sans-serif;font-weight:700;font-size:22px;letter-spacing:.5px}
+  .logo span{color:var(--accent)}
+  h1{font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,7vw,34px);line-height:1.15;margin:14px 0 6px}
+  .lead{color:var(--muted);margin:0 0 18px}
+
+  /* Preview */
+  .stage{background:var(--wall);border-radius:var(--radius);min-height:190px;display:flex;align-items:center;justify-content:center;padding:28px 10px 34px;position:relative;overflow:hidden}
+  .stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18px;background:linear-gradient(transparent,rgba(0,0,0,.035))}
+  .letters{display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-end;gap:.04em;font-family:Fredoka,sans-serif;font-weight:700;line-height:1;user-select:none}
+  .L{position:relative;display:inline-block;color:var(--c);cursor:pointer;
+     text-shadow:0 .022em 0 color-mix(in srgb,var(--c) 85%,#000),0 .05em .08em rgba(60,40,30,.16);
+     transition:transform .15s}
+  .L::before{content:attr(data-l);position:absolute;inset:0;color:transparent;
+     background:linear-gradient(155deg,rgba(255,255,255,.75) 0 22%,rgba(255,255,255,0) 40%);
+     -webkit-background-clip:text;background-clip:text;pointer-events:none}
+  .L.sel{transform:translateY(-6px)}
+  .L.sel::after{content:"";position:absolute;left:20%;right:20%;bottom:-.16em;height:4px;border-radius:4px;background:var(--ink)}
+  .empty{color:var(--muted);font-family:Fredoka;font-size:20px}
+  .note{font-size:13px;color:var(--muted);text-align:center;margin:8px 0 0}
+
+  /* Controls */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:16px}
+  .lbl{font-family:Fredoka;font-weight:600;font-size:17px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+  .lbl small{font-family:Nunito;font-weight:600;color:var(--muted);font-size:13px}
+  input[type=text]{width:100%;font:600 22px Fredoka,sans-serif;letter-spacing:2px;text-transform:uppercase;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);outline:none}
+  input[type=text]:focus{border-color:var(--accent)}
+  .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .opt{border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;font:inherit;color:inherit}
+  .opt b{display:block;font-family:Fredoka;font-weight:600;font-size:17px}
+  .opt span{font-size:13px;color:var(--muted)}
+  .opt[aria-pressed=true]{border-color:var(--ink);background:#FFF8F2}
+  .mode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .mode .opt{padding:9px 6px;font-weight:700;font-size:14px}
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  .sw{aspect-ratio:1;border-radius:50%;border:2px solid rgba(0,0,0,.08);background:var(--c);cursor:pointer;position:relative;padding:0}
+  .sw[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:2px}
+  .swname{font-size:13px;color:var(--muted);margin-top:10px;min-height:20px}
+  .hint{font-size:13px;color:var(--muted);margin:0 0 10px}
+  .row-actions{display:flex;justify-content:flex-end;margin-top:10px}
+  .link{background:none;border:none;color:var(--accent);font:700 14px Nunito;cursor:pointer;padding:4px}
+
+  /* Summary */
+  .sum{display:grid;gap:6px;font-size:15px}
+  .sum div{display:flex;justify-content:space-between}
+  .sum .tot{border-top:1px dashed var(--line);padding-top:10px;margin-top:4px;font-family:Fredoka;font-weight:600;font-size:21px}
+  .pay{width:100%;margin-top:16px;border:none;border-radius:16px;background:var(--accent);color:var(--accent-ink);font:600 19px Fredoka,sans-serif;padding:16px;cursor:pointer;box-shadow:0 6px 0 color-mix(in srgb,var(--accent) 70%,#000)}
+  .pay:active{transform:translateY(3px);box-shadow:0 3px 0 color-mix(in srgb,var(--accent) 70%,#000)}
+  .pay[disabled]{opacity:.55;cursor:default}
+  .err{color:#B3261E;font-size:14px;margin:10px 0 0;min-height:1em}
+  .secure{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
+
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .fact{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;font-size:14px}
+  .fact b{font-family:Fredoka;font-weight:600;font-size:16px;display:block}
+  footer{text-align:center;font-size:13px;color:var(--muted);padding:28px 0 40px}
+  footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo" id="shopName">Buchstaben<span>liebe</span></div>
+    <h1>Der Name für das Kinderzimmer – von dir gestaltet</h1>
+    <p class="lead">Name eingeben, Größe und Farben wählen, fertig. Jeder Buchstabe wird für euch im 3D-Druck gefertigt und von Hand veredelt.</p>
+  </header>
+
+  <section id="konfigurator">
+    <div class="stage"><div class="letters" id="preview" aria-live="polite"></div></div>
+    <p class="note" id="previewNote">Vorschau ungefähr – Farben können je nach Bildschirm leicht abweichen.</p>
+
+    <div class="card">
+      <p class="lbl">1. Name <small id="count"></small></p>
+      <input type="text" id="name" value="EMMA" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="Name">
+    </div>
+
+    <div class="card">
+      <p class="lbl">2. Größe <small>Preis pro Buchstabe</small></p>
+      <div class="seg" id="sizes"></div>
+    </div>
+
+    <div class="card">
+      <p class="lbl">3. Farben</p>
+      <div class="mode">
+        <button class="opt" id="modeOne" aria-pressed="true">Eine Farbe für alle</button>
+        <button class="opt" id="modeEach" aria-pressed="false">Jeder Buchstabe anders</button>
+      </div>
+      <p class="hint" id="colorHint"></p>
+      <div class="swatches" id="swatches"></div>
+      <div class="swname" id="swname"></div>
+      <div class="row-actions" id="mixRow" hidden><button class="link" id="mix">Zufällig mischen ✨</button></div>
+    </div>
+
+    <div class="card">
+      <div class="sum">
+        <div><span id="sumLetters"></span><span id="sumLettersP"></span></div>
+        <div><span>Versand</span><span id="sumShip"></span></div>
+        <div class="tot"><span>Gesamt</span><span id="sumTotal"></span></div>
+      </div>
+      <button class="pay" id="pay">Jetzt bezahlen</button>
+      <p class="err" id="err" role="alert"></p>
+      <p class="secure">Sichere Zahlung über Stripe · Lieferadresse gibst du im nächsten Schritt ein</p>
+    </div>
+  </section>
+
+  <div class="facts">
+    <div class="fact"><b>Handgemacht</b>3D-gedruckt und von Hand veredelt – jedes Stück ein Unikat.</div>
+    <div class="fact"><b>Leicht &amp; sicher</b>Aus PLA, sehr leicht und bruchfest – ideal fürs Kinderzimmer.</div>
+    <div class="fact"><b>Fertigung</b><span id="prodTime"></span> nach Zahlungseingang, plus Versand.</div>
+    <div class="fact"><b>Personalisiert</b>Bitte prüfe die Schreibweise – Einzelanfertigungen sind vom Umtausch ausgeschlossen.</div>
+  </div>
+
+  <footer>
+    <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+</div>
+
+<script type="module">
+import { CONFIG, normalizeText, priceFor } from "./config.js";
+
+const $ = (id) => document.getElementById(id);
+const eur = (cents) => new Intl.NumberFormat("de-DE",{style:"currency",currency:CONFIG.currency.toUpperCase()}).format(cents/100);
+const colorById = (id) => CONFIG.colors.find(c => c.id === id);
+
+const state = { text: "EMMA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0 };
+state.colors = [...state.text].map(() => CONFIG.defaultColor);
+
+$("prodTime").textContent = CONFIG.productionTime;
+
+// Sizes
+CONFIG.sizes.forEach(s => {
+  const b = document.createElement("button");
+  b.className = "opt"; b.dataset.id = s.id;
+  b.innerHTML = `<b>${s.label}</b><span>${eur(s.price)}</span>`;
+  b.onclick = () => { state.size = s.id; render(); };
+  $("sizes").appendChild(b);
+});
+
+// Swatches
+CONFIG.colors.forEach(c => {
+  const b = document.createElement("button");
+  b.className = "sw"; b.style.setProperty("--c", c.hex);
+  b.dataset.id = c.id; b.title = c.name; b.setAttribute("aria-label", c.name);
+  b.onclick = () => pickColor(c.id);
+  $("swatches").appendChild(b);
+});
+
+function pickColor(id){
+  if (!state.text.length) return;
+  if (state.mode === "one") state.colors = state.colors.map(() => id);
+  else {
+    state.colors[state.sel] = id;
+    if (state.sel < state.text.length - 1) state.sel++;
+  }
+  render();
+}
+
+$("name").addEventListener("input", (e) => {
+  const t = normalizeText(e.target.value);
+  const last = state.colors[state.colors.length - 1] || CONFIG.defaultColor;
+  const oldColors = state.colors;
+  state.colors = [...t].map((_, i) => oldColors[i] || (state.mode === "one" ? (oldColors[0] || CONFIG.defaultColor) : last));
+  state.text = t;
+  if (state.sel >= t.length) state.sel = Math.max(0, t.length - 1);
+  if (e.target.value !== t) {
+    const pos = e.target.selectionStart;
+    e.target.value = t;
+    try { e.target.setSelectionRange(Math.min(pos, t.length), Math.min(pos, t.length)); } catch {}
+  }
+  render();
+});
+
+$("modeOne").onclick = () => { state.mode = "one"; state.colors = state.colors.map(() => state.colors[0] || CONFIG.defaultColor); render(); };
+$("modeEach").onclick = () => { state.mode = "each"; state.sel = 0; render(); };
+$("mix").onclick = () => {
+  const pool = CONFIG.colors.filter(c => c.id !== "weiss" && c.id !== "hellgrau").map(c => c.id);
+  const shuffled = pool.sort(() => Math.random() - .5);
+  state.colors = [...state.text].map((_, i) => shuffled[i % shuffled.length]);
+  render();
+};
+
+function render(){
+  const t = state.text, n = t.length;
+  // preview
+  const pv = $("preview");
+  pv.innerHTML = "";
+  if (!n) pv.innerHTML = `<span class="empty">Gib einen Namen ein ✏️</span>`;
+  const stageW = Math.min(pv.parentElement.clientWidth - 20, 528);
+  const fs = Math.max(30, Math.min(120, stageW / (Math.max(n,3) * 0.66)));
+  pv.style.fontSize = fs + "px";
+  [...t].forEach((ch, i) => {
+    const s = document.createElement("span");
+    const c = colorById(state.colors[i]);
+    s.className = "L" + (state.mode === "each" && i === state.sel ? " sel" : "");
+    s.textContent = ch; s.dataset.l = ch;
+    s.style.setProperty("--c", c.hex);
+    s.onclick = () => { if (state.mode === "one") { state.mode = "each"; } state.sel = i; render(); };
+    pv.appendChild(s);
+  });
+  // если не помещается — уменьшаем
+  let guard = 0;
+  while (n && pv.scrollWidth > stageW && guard++ < 40) {
+    pv.style.fontSize = (parseFloat(pv.style.fontSize) * 0.95) + "px";
+  }
+
+  $("count").textContent = `${n} / ${CONFIG.maxLetters} Buchstaben`;
+  document.querySelectorAll("#sizes .opt").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === state.size));
+  $("modeOne").setAttribute("aria-pressed", state.mode === "one");
+  $("modeEach").setAttribute("aria-pressed", state.mode === "each");
+  $("mixRow").hidden = state.mode !== "each";
+
+  const active = state.mode === "one" ? state.colors[0] : state.colors[state.sel];
+  document.querySelectorAll(".sw").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === active));
+  $("colorHint").textContent = state.mode === "one"
+    ? "Tippe auf eine Farbe."
+    : (n ? `Farbe für „${t[state.sel]}" wählen – oder tippe oben auf einen Buchstaben.` : "");
+  $("swname").textContent = active ? colorById(active)?.name || "" : "";
+
+  const p = priceFor(state.size, n);
+  $("sumLetters").textContent = `${n} × ${p.size.label} à ${eur(p.size.price)}`;
+  $("sumLettersP").textContent = eur(p.letters);
+  $("sumShip").textContent = eur(p.shipping);
+  $("sumTotal").textContent = n ? eur(p.total) : eur(0);
+  $("pay").disabled = !n;
+}
+
+$("pay").onclick = async () => {
+  $("err").textContent = "";
+  $("pay").disabled = true; $("pay").textContent = "Einen Moment …";
+  try {
+    const r = await fetch("/api/checkout", {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ text: state.text, size: state.size, colors: state.colors })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.url) throw new Error(d.error || "Etwas ist schiefgelaufen. Bitte versuch es nochmal.");
+    window.location.href = d.url;
+  } catch (e) {
+    $("err").textContent = e.message;
+    $("pay").disabled = false; $("pay").textContent = "Jetzt bezahlen";
+  }
+};
+
+window.addEventListener("resize", render);
+document.fonts?.ready.then(render);
+render();
+</script>
+</body>
+</html>

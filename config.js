@@ -5,21 +5,21 @@
 // =====================================================================
 
 export const CONFIG = {
-  shopName: "Buchstabenliebe",          // название магазина
+  shopName: "KulikWerk",          // название магазина
   currency: "eur",
   maxLetters: 12,                        // максимум букв в одном заказе
-  productionTime: "7–10 Werktage",       // срок изготовления
+  productionTime: "3–10 Werktage",       // срок изготовления
 
   // Размеры (высота буквы) и цена ЗА ОДНУ БУКВУ
   sizes: [
-    { id: "s", label: "11 cm", price: 700 },
-    { id: "m", label: "13 cm", price: 900 },
-    { id: "l", label: "15 cm", price: 1200 },
+    { id: "s", label: "11 cm", price: 360 },
+    { id: "m", label: "13 cm", price: 410 },
+    { id: "l", label: "15 cm", price: 500 },
   ],
   defaultSize: "m",
 
   // Доставка (одна фиксированная цена за заказ)
-  shipping: { label: "DHL Paket", price: 590 },
+  shipping: { label: "DHL Paket", price: 490 },
   // Страны, куда отправляете (коды ISO)
   countries: ["DE", "AT"],
 

@@ -1,0 +1,10 @@
+body{margin:0;background:#FBF6F0;color:#3B2F2A;font:16px/1.6 Nunito,system-ui,sans-serif}
+.wrap{max-width:680px;margin:0 auto;padding:32px 16px 48px}
+h1{font:600 30px Fredoka,sans-serif;margin:0 0 12px}
+h2{font:600 20px Fredoka,sans-serif;margin:28px 0 6px}
+h3{font:700 16px Nunito,sans-serif;margin:18px 0 4px}
+a{color:#C2506A;font-weight:700}
+.box{background:#fff;border:1px solid #EADFD4;border-radius:22px;padding:22px}
+p,ul{margin:0 0 12px}ul{padding-left:22px}
+.small{font-size:14px;color:#7A6A62}
+nav.back{margin-bottom:14px}

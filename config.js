@@ -23,22 +23,21 @@ export const CONFIG = {
   // Страны, куда отправляете (коды ISO)
   countries: ["DE", "AT"],
 
-  // Цвета: id (латиница, без пробелов), название, цвет для превью
+  // Цвета = филаменты Bambu Lab, из которых печатаются буквы.
+  // id (латиница, без пробелов), название для покупателя, цвет для превью.
+  // hex — официальные коды Bambu Lab; в комментарии — точное название филамента.
   colors: [
-    { id: "rosa",      name: "Rosa",       hex: "#F2B8C6" },
-    { id: "koralle",   name: "Koralle",    hex: "#EC8C7E" },
-    { id: "pfirsich",  name: "Pfirsich",   hex: "#F5C7A1" },
-    { id: "vanille",   name: "Vanille",    hex: "#F4E3AE" },
-    { id: "senf",      name: "Senf",       hex: "#E6C26E" },
-    { id: "mint",      name: "Mint",       hex: "#A8D5C2" },
-    { id: "salbei",    name: "Salbei",     hex: "#B5C9A3" },
-    { id: "petrol",    name: "Petrol",     hex: "#4E8C8C" },
-    { id: "himmel",    name: "Himmelblau", hex: "#A9CBE8" },
-    { id: "lavendel",  name: "Lavendel",   hex: "#C7B8E3" },
-    { id: "weiss",     name: "Weiß",       hex: "#FBF8F3" },
-    { id: "hellgrau",  name: "Hellgrau",   hex: "#C9C2BB" },
+    { id: "babyblau",     name: "Babyblau",    hex: "#A4DBE8" }, // PLA Pure  · Baby Blue
+    { id: "milchrosa",    name: "Milchrosa",   hex: "#F7CED7" }, // PLA Pure  · Milky Pink
+    { id: "eisblau",      name: "Eisblau",     hex: "#A3D8E1" }, // PLA Matte · Ice Blue
+    { id: "sakurarosa",   name: "Sakura-Rosa", hex: "#E8AFCF" }, // PLA Matte · Sakura Pink
+    { id: "aprikose",     name: "Aprikose",    hex: "#FFB673" }, // PLA Pure  · Apricot
+    { id: "fliederlila",  name: "Fliederlila", hex: "#AE96D4" }, // PLA Matte · Lilac Purple
+    { id: "apfelgruen",   name: "Apfelgrün",   hex: "#C2E189" }, // PLA Matte · Apple Green
+    { id: "aschgrau",     name: "Aschgrau",    hex: "#9B9EA0" }, // PLA Matte · Ash Gray
+    { id: "wuestengelb",  name: "Wüstengelb",  hex: "#E8DBB7" }, // PLA Matte · Desert Tan
   ],
-  defaultColor: "rosa",
+  defaultColor: "milchrosa",
 };
 
 // Разрешённые символы: только A–Z (для них есть 3D-модели).

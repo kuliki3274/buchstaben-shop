@@ -198,7 +198,7 @@ $("name").addEventListener("input", (e) => {
 $("modeOne").onclick = () => { state.mode = "one"; state.colors = state.colors.map(() => state.colors[0] || CONFIG.defaultColor); render(); };
 $("modeEach").onclick = () => { state.mode = "each"; state.sel = 0; render(); };
 $("mix").onclick = () => {
-  const pool = CONFIG.colors.filter(c => c.id !== "weiss" && c.id !== "hellgrau").map(c => c.id);
+  const pool = CONFIG.colors.map(c => c.id);
   const shuffled = pool.sort(() => Math.random() - .5);
   state.colors = [...state.text].map((_, i) => shuffled[i % shuffled.length]);
   render();

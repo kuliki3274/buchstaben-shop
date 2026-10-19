@@ -41,13 +41,17 @@ export const CONFIG = {
   defaultColor: "rosa",
 };
 
-// Разрешённые символы: латиница + немецкие умлауты
-export const LETTER_RE = /^[A-ZÄÖÜ]+$/;
+// Разрешённые символы: только A–Z (для них есть 3D-модели).
+// Умлауты заменяются: Ä→AE, Ö→OE, Ü→UE, ß→SS.
+export const LETTER_RE = /^[A-Z]+$/;
+
+const UMLAUTS = { "Ä": "AE", "Ö": "OE", "Ü": "UE", "ẞ": "SS", "ß": "SS" };
 
 export function normalizeText(raw) {
   return String(raw || "")
+    .replace(/[ÄÖÜäöüßẞ]/g, (ch) => UMLAUTS[ch.toUpperCase()] || UMLAUTS[ch])
     .toUpperCase()
-    .replace(/[^A-ZÄÖÜ]/g, "")
+    .replace(/[^A-Z]/g, "")
     .slice(0, CONFIG.maxLetters);
 }
 

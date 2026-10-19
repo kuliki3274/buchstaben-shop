@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Buchstabenliebe – Namen fürs Kinderzimmer</title>
 <meta name="description" content="Gestalte die Buchstaben für das Kinderzimmer selbst: Name, Größe und Farben wählen, sicher bezahlen. Handgemacht im 3D-Druck.">
+<meta name="theme-color" content="#FBF6F0">
+<!-- Vorschau beim Teilen des Links (Instagram, TikTok, WhatsApp, iMessage) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Buchstabenliebe – Namen fürs Kinderzimmer">
+<meta property="og:description" content="Name, Größe und Farben wählen – jeder Buchstabe wird für euch im 3D-Druck gefertigt und von Hand veredelt.">
+<meta property="og:image" content="https://buchstaben-shop.vercel.app/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -24,9 +33,16 @@
   h1{font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,7vw,34px);line-height:1.15;margin:14px 0 6px}
   .lead{color:var(--muted);margin:0 0 18px}
 
-  /* Preview */
-  .stage{background:var(--wall);border-radius:var(--radius);min-height:190px;display:flex;align-items:center;justify-content:center;padding:28px 10px 34px;position:relative;overflow:hidden}
-  .stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18px;background:linear-gradient(transparent,rgba(0,0,0,.035))}
+  /* Preview — «приклеена» к верху экрана: цвет и форму видно, пока выбираешь ниже.
+     На телефоне — компактная полоса сверху, на компьютере — левая колонка. */
+  .preview-col{position:sticky;top:0;z-index:20;margin:0 -16px;padding:8px 16px 10px;background:var(--bg)}
+  .preview-col::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px;background:linear-gradient(var(--bg),rgba(251,246,240,0));pointer-events:none}
+  .stage{background:var(--wall);border-radius:18px;min-height:136px;display:flex;align-items:center;justify-content:center;padding:10px 10px 28px;position:relative;overflow:hidden}
+  .stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:linear-gradient(transparent,rgba(0,0,0,.035));pointer-events:none}
+  .stage .note{position:absolute;left:8px;right:8px;bottom:5px;margin:0;z-index:1;font-size:11px;line-height:1.2;opacity:.85}
+  .livebar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 4px 0;font-size:14px;color:var(--muted)}
+  .livebar span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .livebar b{font-family:Fredoka,sans-serif;font-weight:600;font-size:18px;color:var(--ink);white-space:nowrap}
   .letters{display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-end;gap:0;line-height:1;user-select:none}
   /* Буквы — изображения из 3D-моделей: --img даёт форму и блики, --c — цвет */
   .L{position:relative;display:inline-block;flex:none;width:calc(var(--w)*1em);height:calc(var(--h)*1em);cursor:pointer;
@@ -35,7 +51,11 @@
      -webkit-mask:var(--img) center/100% 100% no-repeat;mask:var(--img) center/100% 100% no-repeat}
   .L i::after{content:"";position:absolute;inset:0;background:var(--img) center/100% 100% no-repeat;mix-blend-mode:hard-light}
   .L.sel{transform:translateY(-6px)}
-  .L.sel::after{content:"";position:absolute;left:20%;right:20%;bottom:-.16em;height:4px;border-radius:4px;background:var(--ink)}
+  /* короткая «пружинка» на букве, у которой только что сменился цвет */
+  .L.pop i{transform-origin:50% 100%;animation:pop .3s ease-out}
+  @keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){.L.pop i{animation:none}.L,.pay{transition:none}}
+  .L.sel::after{content:"";position:absolute;left:20%;right:20%;bottom:-.09em;height:4px;border-radius:4px;background:var(--ink)}
   .empty{color:var(--muted);font-family:Fredoka;font-size:20px}
   .note{font-size:13px;color:var(--muted);text-align:center;margin:8px 0 0}
 
@@ -75,6 +95,21 @@
   .fact b{font-family:Fredoka;font-weight:600;font-size:16px;display:block}
   footer{text-align:center;font-size:13px;color:var(--muted);padding:28px 0 40px}
   footer a{color:inherit}
+
+  /* Компьютер: слева большая превью, справа выбор — всё на одном экране */
+  @media (min-width:900px){
+    .wrap{max-width:1040px}
+    header{padding:36px 0 18px}
+    .lead{max-width:560px;margin:0 auto 22px}
+    .builder{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:start}
+    .preview-col{top:20px;margin:0;padding:0;background:none}
+    .preview-col::after{display:none}
+    .stage{min-height:380px;border-radius:var(--radius);padding:28px 16px 40px}
+    .stage .note{bottom:12px;font-size:12px}
+    .livebar{padding:12px 6px 0;font-size:15px}
+    .controls-col>.card:first-child{margin-top:0}
+    .facts{grid-template-columns:repeat(4,1fr)}
+  }
 </style>
 </head>
 <body>
@@ -85,10 +120,16 @@
     <p class="lead">Name eingeben, Größe und Farben wählen, fertig. Jeder Buchstabe wird für euch im 3D-Druck gefertigt und von Hand veredelt.</p>
   </header>
 
-  <section id="konfigurator">
-    <div class="stage"><div class="letters" id="preview" aria-live="polite"></div></div>
-    <p class="note" id="previewNote">Vorschau ungefähr – Farben können je nach Bildschirm leicht abweichen.</p>
+  <section id="konfigurator" class="builder">
+    <div class="preview-col">
+      <div class="stage">
+        <div class="letters" id="preview" aria-live="polite"></div>
+        <p class="note" id="previewNote">Vorschau ungefähr – Farben können leicht abweichen.</p>
+      </div>
+      <div class="livebar"><span id="liveCfg"></span><b id="liveTotal"></b></div>
+    </div>
 
+    <div class="controls-col">
     <div class="card">
       <p class="lbl">1. Name <small id="count"></small></p>
       <input type="text" id="name" value="EMMA" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="Name">
@@ -116,11 +157,13 @@
       <div class="sum">
         <div><span id="sumLetters"></span><span id="sumLettersP"></span></div>
         <div><span>Versand</span><span id="sumShip"></span></div>
+        <div><span>Fertigung</span><span id="sumProd"></span></div>
         <div class="tot"><span>Gesamt</span><span id="sumTotal"></span></div>
       </div>
       <button class="pay" id="pay">Jetzt bezahlen</button>
       <p class="err" id="err" role="alert"></p>
       <p class="secure">Sichere Zahlung über Stripe · Lieferadresse gibst du im nächsten Schritt ein</p>
+    </div>
     </div>
   </section>
 
@@ -172,9 +215,12 @@ CONFIG.colors.forEach(c => {
 
 function pickColor(id){
   if (!state.text.length) return;
-  if (state.mode === "one") state.colors = state.colors.map(() => id);
-  else {
+  if (state.mode === "one") {
+    state.colors = state.colors.map(() => id);
+    state.pop = state.colors.map((_, i) => i);
+  } else {
     state.colors[state.sel] = id;
+    state.pop = [state.sel];
     if (state.sel < state.text.length - 1) state.sel++;
   }
   render();
@@ -201,6 +247,7 @@ $("mix").onclick = () => {
   const pool = CONFIG.colors.map(c => c.id);
   const shuffled = pool.sort(() => Math.random() - .5);
   state.colors = [...state.text].map((_, i) => shuffled[i % shuffled.length]);
+  state.pop = state.colors.map((_, i) => i);
   render();
 };
 
@@ -211,14 +258,16 @@ function render(){
   pv.innerHTML = "";
   if (!n) pv.innerHTML = `<span class="empty">Gib einen Namen ein ✏️</span>`;
   const stageW = Math.min(pv.parentElement.clientWidth - 20, 528);
-  const fs = Math.max(30, Math.min(120, stageW / (Math.max(n,3) * 0.9)));
+  // на телефоне превью компактная (она закреплена сверху), на компьютере — крупная
+  const cap = window.matchMedia("(min-width:900px)").matches ? 150 : 78;
+  const fs = Math.max(30, Math.min(cap, stageW / (Math.max(n,3) * 0.9)));
   pv.style.fontSize = fs + "px";
   pv.setAttribute("aria-label", t);
   [...t].forEach((ch, i) => {
     const s = document.createElement("span");
     const c = colorById(state.colors[i]);
     const g = GLYPHS[ch];
-    s.className = "L" + (state.mode === "each" && i === state.sel ? " sel" : "");
+    s.className = "L" + (state.mode === "each" && i === state.sel ? " sel" : "") + (state.pop?.includes(i) ? " pop" : "");
     s.dataset.l = ch;
     s.setAttribute("aria-hidden", "true");
     s.style.setProperty("--c", c.hex);
@@ -253,7 +302,11 @@ function render(){
   $("sumLettersP").textContent = eur(p.letters);
   $("sumShip").textContent = eur(p.shipping);
   $("sumTotal").textContent = n ? eur(p.total) : eur(0);
+  $("sumProd").textContent = CONFIG.productionTime;
+  $("liveCfg").textContent = n ? `${t} · ${p.size.label} · inkl. Versand` : "Name eingeben";
+  $("liveTotal").textContent = n ? eur(p.total) : eur(0);
   $("pay").disabled = !n;
+  state.pop = null;
 }
 
 $("pay").onclick = async () => {
@@ -272,6 +325,11 @@ $("pay").onclick = async () => {
     $("pay").disabled = false; $("pay").textContent = "Jetzt bezahlen";
   }
 };
+
+// Вернулись кнопкой «Назад» со страницы оплаты — кнопка не должна остаться «Einen Moment …»
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) { $("pay").textContent = "Jetzt bezahlen"; $("pay").disabled = !state.text.length; }
+});
 
 window.addEventListener("resize", render);
 document.fonts?.ready.then(render);

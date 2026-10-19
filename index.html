@@ -27,13 +27,13 @@
   /* Preview */
   .stage{background:var(--wall);border-radius:var(--radius);min-height:190px;display:flex;align-items:center;justify-content:center;padding:28px 10px 34px;position:relative;overflow:hidden}
   .stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18px;background:linear-gradient(transparent,rgba(0,0,0,.035))}
-  .letters{display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-end;gap:.04em;font-family:Fredoka,sans-serif;font-weight:700;line-height:1;user-select:none}
-  .L{position:relative;display:inline-block;color:var(--c);cursor:pointer;
-     text-shadow:0 .022em 0 color-mix(in srgb,var(--c) 85%,#000),0 .05em .08em rgba(60,40,30,.16);
-     transition:transform .15s}
-  .L::before{content:attr(data-l);position:absolute;inset:0;color:transparent;
-     background:linear-gradient(155deg,rgba(255,255,255,.75) 0 22%,rgba(255,255,255,0) 40%);
-     -webkit-background-clip:text;background-clip:text;pointer-events:none}
+  .letters{display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-end;gap:0;line-height:1;user-select:none}
+  /* Буквы — изображения из 3D-моделей: --img даёт форму и блики, --c — цвет */
+  .L{position:relative;display:inline-block;flex:none;width:calc(var(--w)*1em);height:calc(var(--h)*1em);cursor:pointer;
+     filter:drop-shadow(0 .03em .04em rgba(60,40,30,.22));transition:transform .15s}
+  .L i{position:absolute;inset:0;background:var(--c);
+     -webkit-mask:var(--img) center/100% 100% no-repeat;mask:var(--img) center/100% 100% no-repeat}
+  .L i::after{content:"";position:absolute;inset:0;background:var(--img) center/100% 100% no-repeat;mix-blend-mode:hard-light}
   .L.sel{transform:translateY(-6px)}
   .L.sel::after{content:"";position:absolute;left:20%;right:20%;bottom:-.16em;height:4px;border-radius:4px;background:var(--ink)}
   .empty{color:var(--muted);font-family:Fredoka;font-size:20px}
@@ -92,6 +92,7 @@
     <div class="card">
       <p class="lbl">1. Name <small id="count"></small></p>
       <input type="text" id="name" value="EMMA" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="Name">
+      <p class="hint" style="margin:8px 0 0">Buchstaben A–Z · Umlaute werden als AE, OE, UE gefertigt.</p>
     </div>
 
     <div class="card">
@@ -137,6 +138,10 @@
 
 <script type="module">
 import { CONFIG, normalizeText, priceFor } from "./config.js";
+import { GLYPHS } from "./letters/glyphs.js";
+
+// Заранее загружаем изображения букв, чтобы превью не мигало
+Object.keys(GLYPHS).forEach((ch) => { const im = new Image(); im.src = `letters/${ch}.webp`; });
 
 const $ = (id) => document.getElementById(id);
 const eur = (cents) => new Intl.NumberFormat("de-DE",{style:"currency",currency:CONFIG.currency.toUpperCase()}).format(cents/100);
@@ -193,7 +198,7 @@ $("name").addEventListener("input", (e) => {
 $("modeOne").onclick = () => { state.mode = "one"; state.colors = state.colors.map(() => state.colors[0] || CONFIG.defaultColor); render(); };
 $("modeEach").onclick = () => { state.mode = "each"; state.sel = 0; render(); };
 $("mix").onclick = () => {
-  const pool = CONFIG.colors.filter(c => c.id !== "weiss" && c.id !== "hellgrau").map(c => c.id);
+  const pool = CONFIG.colors.map(c => c.id);
   const shuffled = pool.sort(() => Math.random() - .5);
   state.colors = [...state.text].map((_, i) => shuffled[i % shuffled.length]);
   render();
@@ -206,14 +211,21 @@ function render(){
   pv.innerHTML = "";
   if (!n) pv.innerHTML = `<span class="empty">Gib einen Namen ein ✏️</span>`;
   const stageW = Math.min(pv.parentElement.clientWidth - 20, 528);
-  const fs = Math.max(30, Math.min(120, stageW / (Math.max(n,3) * 0.66)));
+  const fs = Math.max(30, Math.min(120, stageW / (Math.max(n,3) * 0.9)));
   pv.style.fontSize = fs + "px";
+  pv.setAttribute("aria-label", t);
   [...t].forEach((ch, i) => {
     const s = document.createElement("span");
     const c = colorById(state.colors[i]);
+    const g = GLYPHS[ch];
     s.className = "L" + (state.mode === "each" && i === state.sel ? " sel" : "");
-    s.textContent = ch; s.dataset.l = ch;
+    s.dataset.l = ch;
+    s.setAttribute("aria-hidden", "true");
     s.style.setProperty("--c", c.hex);
+    s.style.setProperty("--w", g.w);
+    s.style.setProperty("--h", g.h);
+    s.style.setProperty("--img", `url("letters/${ch}.webp")`);
+    s.appendChild(document.createElement("i"));
     s.onclick = () => { if (state.mode === "one") { state.mode = "each"; } state.sel = i; render(); };
     pv.appendChild(s);
   });

@@ -6,6 +6,10 @@
 <title>KulikWerk – Namen fürs Kinderzimmer</title>
 <meta name="description" content="Gestalte die Buchstaben für das Kinderzimmer selbst: Name, Größe und Farben wählen, sicher bezahlen. Handgemacht im 3D-Druck.">
 <meta name="theme-color" content="#FBF6F0">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <!-- Vorschau beim Teilen des Links (Instagram, TikTok, WhatsApp, iMessage) -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="KulikWerk – Namen fürs Kinderzimmer">
@@ -89,6 +93,13 @@
   .err{color:#B3261E;font-size:14px;margin:10px 0 0;min-height:1em}
   .secure{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 0}
 
+  .gal{margin-top:28px}
+  .gal h2{font:600 20px Fredoka,sans-serif;margin:0 0 4px}
+  .gal p{margin:0 0 12px;color:var(--muted);font-size:14px}
+  .gal .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .gal figure{margin:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--wall);aspect-ratio:4/5}
+  .gal img{width:100%;height:100%;object-fit:cover;display:block}
+  @media (min-width:900px){.gal .grid{grid-template-columns:repeat(4,1fr)}}
   .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
   .fact{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;font-size:14px}
   .fact b{font-family:Fredoka;font-weight:600;font-size:16px;display:block}
@@ -131,7 +142,7 @@
     <div class="controls-col">
     <div class="card">
       <p class="lbl">1. Name <small id="count"></small></p>
-      <input type="text" id="name" value="EMMA" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="Name">
+      <input type="text" id="name" value="EVA" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="Name">
       <p class="hint" style="margin:8px 0 0">Buchstaben A–Z · Umlaute werden als AE, OE, UE gefertigt.</p>
     </div>
 
@@ -167,6 +178,17 @@
     </div>
   </section>
 
+  <section class="gal" aria-labelledby="galH">
+    <h2 id="galH">So sehen sie in echt aus</h2>
+    <p>Echte Fotos aus unserer Werkstatt – 3D-gedruckt und von Hand veredelt.</p>
+    <div class="grid">
+      <figure><img src="beispiele/noah.jpg" width="800" height="1000" loading="lazy" alt="Der Name NOAH in Hellblau, Orange und Grau an einer Magnettafel"></figure>
+      <figure><img src="beispiele/lila-buchstaben.jpg" width="800" height="1000" loading="lazy" alt="Glänzende Buchstaben in Lila auf einem Holztisch"></figure>
+      <figure><img src="beispiele/farben-holz.jpg" width="800" height="1000" loading="lazy" alt="Buchstaben in Pastellfarben auf einer Holzbank"></figure>
+      <figure><img src="beispiele/alphabet.jpg" width="800" height="1000" loading="lazy" alt="Namen aus bunten Buchstaben auf dem Boden gelegt"></figure>
+    </div>
+  </section>
+
   <div class="facts">
     <div class="fact"><b>Handgemacht</b>3D-gedruckt und von Hand veredelt – jedes Stück ein Unikat.</div>
     <div class="fact"><b>Leicht &amp; sicher</b>Aus PLA, sehr leicht und bruchfest – ideal fürs Kinderzimmer.</div>
@@ -190,7 +212,7 @@ const $ = (id) => document.getElementById(id);
 const eur = (cents) => new Intl.NumberFormat("de-DE",{style:"currency",currency:CONFIG.currency.toUpperCase()}).format(cents/100);
 const colorById = (id) => CONFIG.colors.find(c => c.id === id);
 
-const state = { text: "EMMA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0 };
+const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0 };
 state.colors = [...state.text].map(() => CONFIG.defaultColor);
 
 $("prodTime").textContent = CONFIG.productionTime;

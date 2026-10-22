@@ -211,13 +211,16 @@
   </div>
 
   <footer>
-    <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a> · <a href="agb.html">AGB</a> · <a href="widerruf.html">Widerruf &amp; Versand</a>
+    <a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a> · <a href="agb.html">AGB</a> · <a href="widerruf.html">Widerruf &amp; Versand</a><span data-consent> · <a href="#">Cookie-Einstellungen</a></span>
   </footer>
 </div>
 
 <script type="module">
 import { CONFIG, normalizeText, priceFor, isDresdenZip } from "./config.js";
 import { GLYPHS } from "./letters/glyphs.js";
+import { initConsent, metaTrack } from "./consent.js";
+
+initConsent();
 
 // Заранее загружаем изображения букв, чтобы превью не мигало
 Object.keys(GLYPHS).forEach((ch) => { const im = new Image(); im.src = `letters/${ch}.webp`; });
@@ -227,6 +230,12 @@ const eur = (cents) => new Intl.NumberFormat("de-DE",{style:"currency",currency:
 const colorById = (id) => CONFIG.colors.find(c => c.id === id);
 
 const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0, delivery: "dhl", zip: "" };
+
+// Текущая сумма заказа для событий Meta (в евро, с доставкой)
+function orderValue() {
+  const p = priceFor(state.size, state.text.length, state.delivery === "dresden" && isDresdenZip(state.zip));
+  return { value: p ? p.total / 100 : 0, currency: CONFIG.currency.toUpperCase(), num_items: state.text.length, content_type: "product", content_ids: ["name-buchstaben"] };
+}
 
 // Statistik-Hook: ohne eingebundenen Statistik-Dienst passiert hier nichts. Es werden nie Namen oder PLZ gesendet.
 const fired = new Set();
@@ -276,6 +285,7 @@ $("name").addEventListener("input", (e) => {
   const oldColors = state.colors;
   state.colors = [...t].map((_, i) => oldColors[i] || (state.mode === "one" ? (oldColors[0] || CONFIG.defaultColor) : last));
   state.text = t;
+  if (t.length && !fired.has("meta:customize")) { fired.add("meta:customize"); metaTrack("CustomizeProduct", orderValue()); }
   if (state.sel >= t.length) state.sel = Math.max(0, t.length - 1);
   if (e.target.value !== t) {
     const pos = e.target.selectionStart;
@@ -373,6 +383,7 @@ $("zip").addEventListener("input", (e) => {
 $("pay").onclick = async () => {
   $("err").textContent = "";
   track("Bestellen geklickt", { groesse: CONFIG.sizes.find(s => s.id === state.size).label, buchstaben: state.text.length, lieferart: state.delivery === "dresden" && isDresdenZip(state.zip) ? "Dresden" : "DHL" });
+  metaTrack("InitiateCheckout", orderValue());
   $("pay").disabled = true; $("pay").textContent = "Einen Moment …";
   try {
     const r = await fetch("/api/checkout", {
@@ -407,6 +418,9 @@ if ("IntersectionObserver" in window) {
   watch(".gal", "Galerie gesehen");
   watch("#pay", "Bestell-Button gesehen");
   watch(".facts", "Infos gesehen");
+  // Meta: посетитель дошёл до конструктора. Следим за полем имени — сам блок выше экрана телефона
+  const kon = document.getElementById("name");
+  if (kon) { const io = new IntersectionObserver((en) => { if (en.some(x => x.isIntersecting)) { metaTrack("ViewContent", orderValue()); io.disconnect(); } }, { threshold: 0.5 }); io.observe(kon); }
 }
 document.querySelectorAll("footer a, .secure a").forEach(a => a.addEventListener("click", () => track("Rechtliches geoeffnet", { seite: a.getAttribute("href") })));
 </script>

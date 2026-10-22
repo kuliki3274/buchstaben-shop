@@ -2,7 +2,7 @@
 // ПЕРЕСЧИТЫВАЕТ цену сама (клиенту не доверяем) и создаёт оплату в Stripe.
 // Секретный ключ берётся из настроек Vercel: STRIPE_SECRET_KEY.
 
-import { CONFIG, LETTER_RE, priceFor } from "../config.js";
+import { CONFIG, LETTER_RE, priceFor, isDresdenZip } from "../config.js";
 
 function flatten(obj, prefix = "", out = []) {
   for (const [k, v] of Object.entries(obj)) {
@@ -23,7 +23,8 @@ export function buildSession(body, origin) {
   if (colors.length !== text.length) throw new Error("Farbauswahl unvollständig.");
   const colorObjs = colors.map((id) => CONFIG.colors.find((c) => c.id === id));
   if (colorObjs.some((c) => !c)) throw new Error("Unbekannte Farbe.");
-  const p = priceFor(body?.size, text.length);
+  const local = body?.delivery === "dresden" && isDresdenZip(body?.zip);
+  const p = priceFor(body?.size, text.length, local);
   if (!p) throw new Error("Unbekannte Größe.");
 
   const sameColor = colorObjs.every((c) => c.id === colorObjs[0].id);
@@ -55,11 +56,12 @@ export function buildSession(body, origin) {
       0: {
         shipping_rate_data: {
           type: "fixed_amount",
-          display_name: CONFIG.shipping.label,
-          fixed_amount: { amount: CONFIG.shipping.price, currency: CONFIG.currency },
+          display_name: local ? CONFIG.localDelivery.label : CONFIG.shipping.label,
+          fixed_amount: { amount: p.shipping, currency: CONFIG.currency },
         },
       },
     },
+    ...(local ? { custom_text: { shipping_address: { message: "Kostenlose persönliche Lieferung gilt nur für Adressen in Dresden." } } } : {}),
     phone_number_collection: { enabled: "true" },
     custom_fields: {
       0: {
@@ -71,9 +73,9 @@ export function buildSession(body, origin) {
     },
     payment_intent_data: {
       description: summary.slice(0, 1000),
-      metadata: { name: text, groesse: p.size.label, farben: colorSummary.slice(0, 500) },
+      metadata: { name: text, groesse: p.size.label, farben: colorSummary.slice(0, 500), lieferart: local ? "Dresden persönlich" : "DHL" },
     },
-    metadata: { name: text, groesse: p.size.label, farben: colorSummary.slice(0, 500) },
+    metadata: { name: text, groesse: p.size.label, farben: colorSummary.slice(0, 500), lieferart: local ? "Dresden persönlich" : "DHL", plz: String(body?.zip || "").slice(0, 10) },
     success_url: `${origin}/danke.html?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/#konfigurator`,
   };

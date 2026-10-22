@@ -20,8 +20,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="fonts/fredoka.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
-<script defer data-domain="buchstaben-shop.vercel.app" src="https://plausible.io/js/script.js"></script>
-<script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
 <style>
   :root{
     --bg:#FBF6F0; --card:#FFFFFF; --ink:#3B2F2A; --muted:#8A7B72;
@@ -230,7 +228,7 @@ const colorById = (id) => CONFIG.colors.find(c => c.id === id);
 
 const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0, delivery: "dhl", zip: "" };
 
-// Besucherstatistik (Plausible, ohne Cookies). Es werden nie Namen, PLZ oder andere Eingaben gesendet.
+// Statistik-Hook: ohne eingebundenen Statistik-Dienst passiert hier nichts. Es werden nie Namen oder PLZ gesendet.
 const fired = new Set();
 function track(name, props, once) {
   if (once) { if (fired.has(name)) return; fired.add(name); }

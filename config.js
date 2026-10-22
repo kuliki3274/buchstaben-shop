@@ -20,6 +20,12 @@ export const CONFIG = {
 
   // Доставка (одна фиксированная цена за заказ)
   shipping: { label: "DHL Paket", price: 490 },
+  // Бесплатная личная доставка по Дрездену: клиент выбирает её и вводит PLZ.
+  // Список PLZ Дрездена — сюда можно добавлять/убирать индексы.
+  localDelivery: {
+    label: "Persönliche Lieferung in Dresden",
+    zips: ["01067","01069","01097","01099","01108","01109","01127","01129","01139","01156","01157","01159","01169","01187","01189","01217","01219","01237","01239","01257","01259","01277","01279","01307","01309","01324","01326","01328","01465"],
+  },
   // Страны, куда отправляете (коды ISO)
   countries: ["DE", "AT"],
 
@@ -54,9 +60,14 @@ export function normalizeText(raw) {
     .slice(0, CONFIG.maxLetters);
 }
 
-export function priceFor(sizeId, letterCount) {
+export function isDresdenZip(zip) {
+  return CONFIG.localDelivery.zips.includes(String(zip || "").trim());
+}
+
+export function priceFor(sizeId, letterCount, local = false) {
   const size = CONFIG.sizes.find((s) => s.id === sizeId);
   if (!size) return null;
   const letters = size.price * letterCount;
-  return { size, letters, shipping: CONFIG.shipping.price, total: letters + CONFIG.shipping.price };
+  const shipping = local ? 0 : CONFIG.shipping.price;
+  return { size, letters, shipping, total: letters + shipping };
 }

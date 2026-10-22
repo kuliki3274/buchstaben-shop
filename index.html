@@ -79,6 +79,8 @@
   .sw{aspect-ratio:1;border-radius:50%;border:2px solid rgba(0,0,0,.08);background:var(--c);cursor:pointer;position:relative;padding:0}
   .sw[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:2px}
   .swname{font-size:13px;color:var(--muted);margin-top:10px;min-height:20px}
+  input.zip{font-size:20px;letter-spacing:3px}
+  .opt small{display:block;font-weight:600;color:var(--muted);font-size:12px;margin-top:2px}
   .hint{font-size:13px;color:var(--muted);margin:0 0 10px}
   .row-actions{display:flex;justify-content:flex-end;margin-top:10px}
   .link{background:none;border:none;color:var(--accent);font:700 14px Nunito;cursor:pointer;padding:4px}
@@ -164,9 +166,21 @@
     </div>
 
     <div class="card">
+      <p class="lbl">4. Lieferung</p>
+      <div class="mode">
+        <button class="opt" id="delDhl" aria-pressed="true">DHL Paket<small id="delDhlP"></small></button>
+        <button class="opt" id="delDd" aria-pressed="false">Dresden persönlich<small>kostenlos</small></button>
+      </div>
+      <div id="zipRow" hidden>
+        <input type="text" class="zip" id="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="PLZ in Dresden" aria-label="Postleitzahl in Dresden">
+        <p class="hint" id="zipHint" style="margin:8px 0 0"></p>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="sum">
         <div><span id="sumLetters"></span><span id="sumLettersP"></span></div>
-        <div><span>Versand</span><span id="sumShip"></span></div>
+        <div><span id="sumShipLbl">Versand</span><span id="sumShip"></span></div>
         <div><span>Fertigung</span><span id="sumProd"></span></div>
         <div class="tot"><span>Gesamt</span><span id="sumTotal"></span></div>
       </div>
@@ -202,7 +216,7 @@
 </div>
 
 <script type="module">
-import { CONFIG, normalizeText, priceFor } from "./config.js";
+import { CONFIG, normalizeText, priceFor, isDresdenZip } from "./config.js";
 import { GLYPHS } from "./letters/glyphs.js";
 
 // Заранее загружаем изображения букв, чтобы превью не мигало
@@ -212,7 +226,14 @@ const $ = (id) => document.getElementById(id);
 const eur = (cents) => new Intl.NumberFormat("de-DE",{style:"currency",currency:CONFIG.currency.toUpperCase()}).format(cents/100);
 const colorById = (id) => CONFIG.colors.find(c => c.id === id);
 
-const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0 };
+const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0, delivery: "dhl", zip: "" };
+
+// Statistik-Hook: ohne eingebundenen Statistik-Dienst passiert hier nichts. Es werden nie Namen oder PLZ gesendet.
+const fired = new Set();
+function track(name, props, once) {
+  if (once) { if (fired.has(name)) return; fired.add(name); }
+  try { window.plausible && window.plausible(name, props ? { props } : undefined); } catch (e) {}
+}
 state.colors = [...state.text].map(() => CONFIG.defaultColor);
 
 $("prodTime").textContent = CONFIG.productionTime;
@@ -222,7 +243,7 @@ CONFIG.sizes.forEach(s => {
   const b = document.createElement("button");
   b.className = "opt"; b.dataset.id = s.id;
   b.innerHTML = `<b>${s.label}</b><span>${eur(s.price)}</span>`;
-  b.onclick = () => { state.size = s.id; render(); };
+  b.onclick = () => { state.size = s.id; track("Groesse gewaehlt", { groesse: s.label }); render(); };
   $("sizes").appendChild(b);
 });
 
@@ -231,7 +252,7 @@ CONFIG.colors.forEach(c => {
   const b = document.createElement("button");
   b.className = "sw"; b.style.setProperty("--c", c.hex);
   b.dataset.id = c.id; b.title = c.name; b.setAttribute("aria-label", c.name);
-  b.onclick = () => pickColor(c.id);
+  b.onclick = () => { track("Farbe gewaehlt", { farbe: c.name, modus: state.mode === "one" ? "alle" : "einzeln" }); pickColor(c.id); };
   $("swatches").appendChild(b);
 });
 
@@ -249,6 +270,7 @@ function pickColor(id){
 }
 
 $("name").addEventListener("input", (e) => {
+  track("Name geaendert", null, true);
   const t = normalizeText(e.target.value);
   const last = state.colors[state.colors.length - 1] || CONFIG.defaultColor;
   const oldColors = state.colors;
@@ -263,9 +285,10 @@ $("name").addEventListener("input", (e) => {
   render();
 });
 
-$("modeOne").onclick = () => { state.mode = "one"; state.colors = state.colors.map(() => state.colors[0] || CONFIG.defaultColor); render(); };
-$("modeEach").onclick = () => { state.mode = "each"; state.sel = 0; render(); };
+$("modeOne").onclick = () => { track("Modus eine Farbe"); state.mode = "one"; state.colors = state.colors.map(() => state.colors[0] || CONFIG.defaultColor); render(); };
+$("modeEach").onclick = () => { track("Modus jeder anders"); state.mode = "each"; state.sel = 0; render(); };
 $("mix").onclick = () => {
+  track("Zufaellig gemischt");
   const pool = CONFIG.colors.map(c => c.id);
   const shuffled = pool.sort(() => Math.random() - .5);
   state.colors = [...state.text].map((_, i) => shuffled[i % shuffled.length]);
@@ -319,30 +342,49 @@ function render(){
     : (n ? `Farbe für „${t[state.sel]}" wählen – oder tippe oben auf einen Buchstaben.` : "");
   $("swname").textContent = active ? colorById(active)?.name || "" : "";
 
-  const p = priceFor(state.size, n);
+  const local = state.delivery === "dresden" && isDresdenZip(state.zip);
+  const p = priceFor(state.size, n, local);
+  $("delDhl").setAttribute("aria-pressed", state.delivery === "dhl");
+  $("delDd").setAttribute("aria-pressed", state.delivery === "dresden");
+  $("delDhlP").textContent = eur(CONFIG.shipping.price);
+  $("zipRow").hidden = state.delivery !== "dresden";
+  $("zipHint").textContent = state.delivery !== "dresden" ? "" : local ? "✓ Wir bringen deine Buchstaben persönlich vorbei – kostenlos."
+    : state.zip.length === 5 ? "Diese PLZ gehört nicht zu Dresden – es gilt DHL-Versand." : "Bitte gib deine Dresdner PLZ ein.";
+  $("sumShipLbl").textContent = local ? "Lieferung Dresden" : "Versand";
   $("sumLetters").textContent = `${n} × ${p.size.label} à ${eur(p.size.price)}`;
   $("sumLettersP").textContent = eur(p.letters);
-  $("sumShip").textContent = eur(p.shipping);
+  $("sumShip").textContent = p.shipping ? eur(p.shipping) : "kostenlos";
   $("sumTotal").textContent = n ? eur(p.total) : eur(0);
   $("sumProd").textContent = CONFIG.productionTime;
-  $("liveCfg").textContent = n ? `${t} · ${p.size.label} · inkl. Versand` : "Name eingeben";
+  $("liveCfg").textContent = n ? `${t} · ${p.size.label} · inkl. ${local ? "Lieferung" : "Versand"}` : "Name eingeben";
   $("liveTotal").textContent = n ? eur(p.total) : eur(0);
   $("pay").disabled = !n;
   state.pop = null;
 }
 
+$("delDhl").onclick = () => { state.delivery = "dhl"; track("Lieferart", { art: "DHL" }); render(); };
+$("delDd").onclick = () => { state.delivery = "dresden"; track("Lieferart", { art: "Dresden" }); render(); };
+$("zip").addEventListener("input", (e) => {
+  state.zip = e.target.value.replace(/\D/g, "").slice(0, 5); e.target.value = state.zip;
+  if (state.zip.length === 5) track("PLZ geprueft", { dresden: isDresdenZip(state.zip) ? "ja" : "nein" });
+  render();
+});
+
 $("pay").onclick = async () => {
   $("err").textContent = "";
+  track("Bestellen geklickt", { groesse: CONFIG.sizes.find(s => s.id === state.size).label, buchstaben: state.text.length, lieferart: state.delivery === "dresden" && isDresdenZip(state.zip) ? "Dresden" : "DHL" });
   $("pay").disabled = true; $("pay").textContent = "Einen Moment …";
   try {
     const r = await fetch("/api/checkout", {
       method: "POST", headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ text: state.text, size: state.size, colors: state.colors })
+      body: JSON.stringify({ text: state.text, size: state.size, colors: state.colors, delivery: state.delivery, zip: state.zip })
     });
     const d = await r.json().catch(() => ({}));
     if (!r.ok || !d.url) throw new Error(d.error || "Etwas ist schiefgelaufen. Bitte versuch es nochmal.");
+    track("Weiter zu Stripe");
     window.location.href = d.url;
   } catch (e) {
+    track("Bestell-Fehler");
     $("err").textContent = e.message;
     $("pay").disabled = false; $("pay").textContent = "Zahlungspflichtig bestellen";
   }
@@ -350,12 +392,23 @@ $("pay").onclick = async () => {
 
 // Вернулись кнопкой «Назад» со страницы оплаты — кнопка не должна остаться «Einen Moment …»
 window.addEventListener("pageshow", (e) => {
-  if (e.persisted) { $("pay").textContent = "Zahlungspflichtig bestellen"; $("pay").disabled = !state.text.length; }
+  if (e.persisted) { track("Zurueck von Stripe"); $("pay").textContent = "Zahlungspflichtig bestellen"; $("pay").disabled = !state.text.length; }
 });
 
 window.addEventListener("resize", render);
 document.fonts?.ready.then(render);
 render();
+
+// Was sehen Besucher überhaupt? (einmalig pro Besuch)
+if ("IntersectionObserver" in window) {
+  const watch = (sel, name) => { const el = document.querySelector(sel); if (!el) return;
+    const io = new IntersectionObserver((en) => { if (en.some(x => x.isIntersecting)) { track(name, null, true); io.disconnect(); } }, { threshold: 0.5 });
+    io.observe(el); };
+  watch(".gal", "Galerie gesehen");
+  watch("#pay", "Bestell-Button gesehen");
+  watch(".facts", "Infos gesehen");
+}
+document.querySelectorAll("footer a, .secure a").forEach(a => a.addEventListener("click", () => track("Rechtliches geoeffnet", { seite: a.getAttribute("href") })));
 </script>
 </body>
 </html>

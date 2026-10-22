@@ -12,9 +12,9 @@ export const CONFIG = {
 
   // Размеры (высота буквы) и цена ЗА ОДНУ БУКВУ
   sizes: [
-    { id: "s", label: "11 cm", price: 360 },
-    { id: "m", label: "13 cm", price: 410 },
-    { id: "l", label: "15 cm", price: 500 },
+    { id: "s", label: "7 cm", price: 360 },
+    { id: "m", label: "9 cm", price: 410 },
+    { id: "l", label: "11 cm", price: 500 },
   ],
   defaultSize: "m",
 

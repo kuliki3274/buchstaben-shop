@@ -280,12 +280,12 @@ function pickColor(id){
 
 $("name").addEventListener("input", (e) => {
   track("Name geaendert", null, true);
-  if (!fired.has("meta:customize")) { fired.add("meta:customize"); metaTrack("CustomizeProduct", orderValue()); }
   const t = normalizeText(e.target.value);
   const last = state.colors[state.colors.length - 1] || CONFIG.defaultColor;
   const oldColors = state.colors;
   state.colors = [...t].map((_, i) => oldColors[i] || (state.mode === "one" ? (oldColors[0] || CONFIG.defaultColor) : last));
   state.text = t;
+  if (t.length && !fired.has("meta:customize")) { fired.add("meta:customize"); metaTrack("CustomizeProduct", orderValue()); }
   if (state.sel >= t.length) state.sel = Math.max(0, t.length - 1);
   if (e.target.value !== t) {
     const pos = e.target.selectionStart;
@@ -418,9 +418,9 @@ if ("IntersectionObserver" in window) {
   watch(".gal", "Galerie gesehen");
   watch("#pay", "Bestell-Button gesehen");
   watch(".facts", "Infos gesehen");
-  // Meta: посетитель дошёл до конструктора
-  const kon = document.getElementById("konfigurator");
-  if (kon) { const io = new IntersectionObserver((en) => { if (en.some(x => x.isIntersecting)) { metaTrack("ViewContent", orderValue()); io.disconnect(); } }, { threshold: 0.3 }); io.observe(kon); }
+  // Meta: посетитель дошёл до конструктора. Следим за полем имени — сам блок выше экрана телефона
+  const kon = document.getElementById("name");
+  if (kon) { const io = new IntersectionObserver((en) => { if (en.some(x => x.isIntersecting)) { metaTrack("ViewContent", orderValue()); io.disconnect(); } }, { threshold: 0.5 }); io.observe(kon); }
 }
 document.querySelectorAll("footer a, .secure a").forEach(a => a.addEventListener("click", () => track("Rechtliches geoeffnet", { seite: a.getAttribute("href") })));
 </script>

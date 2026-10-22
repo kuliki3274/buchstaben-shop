@@ -47,7 +47,7 @@ export const CONFIG = {
 
   // Meta Pixel (Events Manager → Наборы данных → ID). Пусто = пиксель и баннер cookie выключены.
   // Токен Conversions API НЕ сюда: он секретный, его кладут в Vercel как META_CAPI_TOKEN.
-  metaPixelId: "",
+  metaPixelId: "1664005411761217",
 };
 
 // Разрешённые символы: только A–Z (для них есть 3D-модели).

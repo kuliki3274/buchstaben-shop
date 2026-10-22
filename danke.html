@@ -5,4 +5,26 @@
 </head><body><div class="wrap"><div class="box"><h1>Danke für deine Bestellung! 💛</h1>
 <p>Deine Zahlung ist bei uns angekommen. Eine Bestätigung bekommst du per E-Mail.</p>
 <p>Wir fangen jetzt mit deinen Buchstaben an und melden uns, sobald sie unterwegs sind.</p>
-<p><a href="/">Zurück zum Shop</a></p></div></div></body></html>
+<p><a href="/">Zurück zum Shop</a></p>
+<p class="small"><a href="datenschutz.html">Datenschutz</a><span data-consent> · <a href="#">Cookie-Einstellungen</a></span></p></div></div>
+<script type="module">
+import { initConsent, hasConsent, metaTrack, metaCookies } from "./consent.js";
+
+initConsent();
+
+// Покупка для Meta: сумму берём из Stripe через сервер, а не из адреса страницы.
+// Повторное открытие страницы не считается второй покупкой.
+const id = new URLSearchParams(location.search).get("session_id");
+const doneKey = "kw_purchase_" + id;
+let done = false;
+try { done = Boolean(localStorage.getItem(doneKey)); } catch (e) {}
+if (id && !done) {
+  const q = new URLSearchParams({ session_id: id, consent: hasConsent() ? "1" : "0", ...metaCookies() });
+  fetch("/api/order?" + q).then((r) => r.json()).then((d) => {
+    if (!d.paid) return;
+    metaTrack("Purchase", { value: d.value, currency: d.currency, num_items: d.num_items, content_type: "product", content_ids: ["name-buchstaben"] }, id);
+    try { localStorage.setItem(doneKey, "1"); } catch (e) {}
+  }).catch(() => {});
+}
+</script>
+</body></html>

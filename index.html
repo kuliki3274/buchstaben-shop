@@ -105,6 +105,23 @@
   .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
   .fact{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;font-size:14px}
   .fact b{font-family:Fredoka;font-weight:600;font-size:16px;display:block}
+  /* Настоящие фото сразу под заголовком: доверие «в жизни так же красиво» */
+  .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 6px}
+  .proof a{display:block;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--wall);aspect-ratio:1}
+  .proof img{width:100%;height:100%;object-fit:cover;display:block}
+  .proof-note{font-size:13px;color:var(--muted);text-align:center;margin:0 0 14px}
+  .mount{display:flex;gap:8px;align-items:flex-start;background:#FFF8F2;border-radius:14px;padding:10px 12px;margin-top:14px;font-size:14px}
+  .faq .lbl{margin-bottom:6px}
+  .maker{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+  .maker img{width:64px;height:64px;border-radius:50%;object-fit:cover;flex:none;border:1px solid var(--line)}
+  .maker p{margin:0;font-size:14px}
+  .faq details{border-top:1px solid var(--line);padding:10px 0}
+  .faq details:last-child{padding-bottom:0}
+  .faq summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";font-family:Fredoka;font-size:20px;line-height:1;color:var(--muted)}
+  .faq details[open] summary::after{content:"–"}
+  .faq details p{margin:6px 0 0;font-size:14px;color:var(--muted)}
   footer{text-align:center;font-size:13px;color:var(--muted);padding:28px 0 40px}
   footer a,.secure a{color:inherit}
 
@@ -121,6 +138,7 @@
     .livebar{padding:12px 6px 0;font-size:15px}
     .controls-col>.card:first-child{margin-top:0}
     .facts{grid-template-columns:repeat(4,1fr)}
+    .proof{max-width:560px;margin:0 auto 6px}
   }
 </style>
 </head>
@@ -130,6 +148,12 @@
     <div class="logo" id="shopName">Kulik<span>Werk</span></div>
     <h1>Der Name für das Kinderzimmer – von dir gestaltet</h1>
     <p class="lead">Name eingeben, Größe und Farben wählen, fertig. Jeder Buchstabe wird für euch im 3D-Druck gefertigt und von Hand veredelt.</p>
+    <div class="proof">
+      <a href="#galH"><img src="beispiele/glanz-a.jpg" width="600" height="600" alt="Glänzender hellblauer Buchstabe A in der Hand"></a>
+      <a href="#galH"><img src="beispiele/noah.jpg" width="800" height="1000" alt="Der Name NOAH mit Krone und Fahrrad an einer Tafel"></a>
+      <a href="#galH"><img src="beispiele/lila-buchstaben.jpg" width="800" height="1000" alt="Glänzende Buchstaben in Lila"></a>
+    </div>
+    <p class="proof-note">Echte Fotos · handgemacht in Dresden</p>
   </header>
 
   <section id="konfigurator" class="builder">
@@ -184,10 +208,39 @@
         <div><span>Fertigung</span><span id="sumProd"></span></div>
         <div class="tot"><span>Gesamt</span><span id="sumTotal"></span></div>
       </div>
+      <div class="mount"><span aria-hidden="true">🩹</span><span><b>Fertig zum Aufkleben:</b> Auf jedem Buchstaben ist schon doppelseitiges Klebeband. Folie abziehen, an Tür oder Wand drücken – fertig.</span></div>
       <button class="pay" id="pay">Zahlungspflichtig bestellen</button>
       <p class="err" id="err" role="alert"></p>
       <p class="secure">Sichere Zahlung über Stripe · Lieferadresse gibst du im nächsten Schritt ein</p>
       <p class="secure">Preise in €, Versand inkl. im Gesamtpreis. Kein Umsatzsteuerausweis gem. § 19 UStG. Es gelten unsere <a href="agb.html">AGB</a>. Individuell angefertigt – <a href="widerruf.html">kein Widerrufsrecht</a>.</p>
+    </div>
+
+    <div class="card faq" id="faq">
+      <div class="maker">
+        <img src="beispiele/werkstatt.jpg" width="400" height="400" alt="Glänzender Buchstabe in Andriis Hand">
+        <p><b>Hi, ich bin Andrii 👋</b><br>Jeden Buchstaben drucke, schleife und veredle ich selbst in meiner kleinen Werkstatt in Dresden.</p>
+      </div>
+      <p class="lbl">Fragen &amp; Antworten</p>
+      <details>
+        <summary>Wie bringe ich die Buchstaben an?</summary>
+        <p>Auf jedem Buchstaben klebt schon doppelseitiges Klebeband. Schutzfolie abziehen und auf Tür, Wand oder Schrank drücken. Am besten hält es auf glatten, sauberen und trockenen Flächen.</p>
+      </details>
+      <details>
+        <summary>Wie groß sind sie wirklich?</summary>
+        <p>Du wählst die Höhe: 7, 9 oder 11 cm. Ein 9-cm-Buchstabe ist etwa 8,7 × 7,6 cm groß und gut 2 cm dick – und dabei sehr leicht.</p>
+      </details>
+      <details>
+        <summary>Sind sie fürs Kinderzimmer geeignet?</summary>
+        <p>Die Buchstaben sind Dekoration, kein Spielzeug. Bring sie bitte so an, dass kleine Kinder sie nicht abnehmen und in den Mund nehmen können.</p>
+      </details>
+      <details>
+        <summary>Wann kommt meine Bestellung?</summary>
+        <p>Ich fertige jede Bestellung einzeln, das dauert <span class="prodTime2"></span>. Danach ist das DHL-Paket meist in 1–3 Werktagen bei dir. In Dresden bringe ich sie auch kostenlos persönlich vorbei.</p>
+      </details>
+      <details>
+        <summary>Kann ich etwas am Namen ändern?</summary>
+        <p>Jeder Name wird extra für dich gefertigt – prüf die Schreibweise bitte vor dem Bestellen. Wenn dir danach doch etwas einfällt, schreib mir sofort an <a href="mailto:kuliki3274@icloud.com">kuliki3274@icloud.com</a>.</p>
+      </details>
     </div>
     </div>
   </section>
@@ -218,7 +271,7 @@
 <script type="module">
 import { CONFIG, normalizeText, priceFor, isDresdenZip } from "./config.js";
 import { GLYPHS } from "./letters/glyphs.js";
-import { initConsent, metaTrack } from "./consent.js";
+import { initConsent, metaTrack, metaTrackCustom } from "./consent.js";
 
 initConsent();
 
@@ -239,13 +292,17 @@ function orderValue() {
 
 // Statistik-Hook: ohne eingebundenen Statistik-Dienst passiert hier nichts. Es werden nie Namen oder PLZ gesendet.
 const fired = new Set();
+const META_STEPS = { "Bestell-Button gesehen": "BestellButtonGesehen", "Galerie gesehen": "GalerieGesehen", "FAQ geoeffnet": "FAQGeoeffnet" };
 function track(name, props, once) {
   if (once) { if (fired.has(name)) return; fired.add(name); }
   try { window.plausible && window.plausible(name, props ? { props } : undefined); } catch (e) {}
+  // Эти шаги отправляем в Meta как свои события, чтобы видеть, где люди останавливаются
+  if (META_STEPS[name]) metaTrackCustom(META_STEPS[name]);
 }
 state.colors = [...state.text].map(() => CONFIG.defaultColor);
 
 $("prodTime").textContent = CONFIG.productionTime;
+document.querySelectorAll(".prodTime2").forEach((e) => { e.textContent = CONFIG.productionTime; });
 
 // Sizes
 CONFIG.sizes.forEach(s => {
@@ -418,6 +475,7 @@ if ("IntersectionObserver" in window) {
   watch(".gal", "Galerie gesehen");
   watch("#pay", "Bestell-Button gesehen");
   watch(".facts", "Infos gesehen");
+  document.querySelectorAll(".faq details").forEach(d => d.addEventListener("toggle", () => { if (d.open) track("FAQ geoeffnet", null, true); }));
   // Meta: посетитель дошёл до конструктора. Следим за полем имени — сам блок выше экрана телефона
   const kon = document.getElementById("name");
   if (kon) { const io = new IntersectionObserver((en) => { if (en.some(x => x.isIntersecting)) { metaTrack("ViewContent", orderValue()); io.disconnect(); } }, { threshold: 0.5 }); io.observe(kon); }

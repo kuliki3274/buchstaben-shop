@@ -32,7 +32,7 @@ function loadPixel() {
   document,"script","https://connect.facebook.net/en_US/fbevents.js");
   window.fbq("init", PIXEL);
   window.fbq("track", "PageView");
-  queue.forEach(([ev, params, id]) => send(ev, params, id));
+  queue.forEach(([ev, params, id, fn]) => (fn ? fn() : send(ev, params, id)));
   queue = [];
 }
 
@@ -49,6 +49,15 @@ export function metaTrack(event, params, eventId) {
   const c = stored();
   if (c === "yes") { loadPixel(); send(event, params, eventId); }
   else if (c === null) queue.push([event, params, eventId]);
+}
+
+// Своё событие Meta (не стандартное) — для диагностики: где посетители останавливаются
+export function metaTrackCustom(event, params) {
+  if (!PIXEL) return;
+  const c = stored();
+  const send = () => { try { window.fbq("trackCustom", event, params || {}); } catch (e) {} };
+  if (c === "yes") { loadPixel(); send(); }
+  else if (c === null) queue.push([null, null, null, send]);
 }
 
 // Куки пикселя: нужны серверу для Conversions API, чтобы связать покупку с рекламой
@@ -77,18 +86,16 @@ function banner() {
   el.setAttribute("aria-label", "Cookie-Einstellungen");
   el.innerHTML = `
     <style>
-      #kwConsent{position:fixed;left:12px;right:12px;bottom:12px;z-index:1000;max-width:520px;margin:0 auto;
-        background:#fff;color:#3B2F2A;border:1px solid #EADFD4;border-radius:20px;padding:16px 18px;
-        box-shadow:0 10px 30px rgba(59,47,42,.18);font:15px/1.5 Nunito,system-ui,sans-serif}
-      #kwConsent b{font:600 17px Fredoka,sans-serif;display:block;margin-bottom:4px}
-      #kwConsent p{margin:0 0 12px}
+      #kwConsent{position:fixed;left:10px;right:10px;bottom:10px;z-index:1000;max-width:520px;margin:0 auto;
+        background:#fff;color:#3B2F2A;border:1px solid #EADFD4;border-radius:18px;padding:12px 14px;
+        box-shadow:0 10px 30px rgba(59,47,42,.18);font:13px/1.45 Nunito,system-ui,sans-serif}
+      #kwConsent p{margin:0 0 10px}
       #kwConsent a{color:#C2506A;font-weight:700}
       #kwConsent .row{display:flex;gap:10px}
       #kwConsent button{flex:1;min-height:44px;border-radius:14px;font:700 15px Nunito,sans-serif;cursor:pointer;
-        border:2px solid #3B2F2A;background:#fff;color:#3B2F2A}
+        border:2px solid #3B2F2A;background:#fff;color:#3B2F2A;min-height:40px}
     </style>
-    <b>Cookies &amp; Werbung</b>
-    <p>Mit deiner Einwilligung nutzen wir den Meta-Pixel (Facebook/Instagram), um zu messen, ob unsere Werbung funktioniert, und sie passenden Menschen zu zeigen. Dabei werden Daten an Meta übertragen, auch in die USA. Du kannst die Einwilligung jederzeit unten über „Cookie-Einstellungen“ widerrufen. Mehr in der <a href="datenschutz.html#meta">Datenschutzerklärung</a>.</p>
+    <p><b>Cookies?</b> Mit deiner Einwilligung messen wir mit dem Meta-Pixel, ob unsere Werbung funktioniert (Daten gehen an Meta, auch in die USA). Widerruf jederzeit über „Cookie-Einstellungen“ unten. <a href="datenschutz.html#meta">Mehr</a></p>
     <div class="row">
       <button type="button" data-v="no">Nur notwendige</button>
       <button type="button" data-v="yes">Akzeptieren</button>

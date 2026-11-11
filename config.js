@@ -31,17 +31,18 @@ export const CONFIG = {
 
   // Цвета = филаменты Bambu Lab, из которых печатаются буквы.
   // id (латиница, без пробелов), название для покупателя, цвет для превью.
-  // hex — официальные коды Bambu Lab; в комментарии — точное название филамента.
+  // hex — цвет ГОТОВОЙ буквы под глянцем (он темнее и насыщеннее пластика), снят с фото владельца.
+  // «оценка» = этой буквы на фото не было: взят официальный код Bambu Lab и сдвинут так же, как у остальных.
   colors: [
-    { id: "babyblau",     name: "Babyblau",    hex: "#A4DBE8" }, // PLA Pure  · Baby Blue
-    { id: "milchrosa",    name: "Milchrosa",   hex: "#F7CED7" }, // PLA Pure  · Milky Pink
-    { id: "eisblau",      name: "Eisblau",     hex: "#A3D8E1" }, // PLA Matte · Ice Blue
-    { id: "sakurarosa",   name: "Sakura-Rosa", hex: "#E8AFCF" }, // PLA Matte · Sakura Pink
-    { id: "aprikose",     name: "Aprikose",    hex: "#FFB673" }, // PLA Pure  · Apricot
-    { id: "fliederlila",  name: "Fliederlila", hex: "#AE96D4" }, // PLA Matte · Lilac Purple
-    { id: "apfelgruen",   name: "Apfelgrün",   hex: "#C2E189" }, // PLA Matte · Apple Green
-    { id: "aschgrau",     name: "Aschgrau",    hex: "#9B9EA0" }, // PLA Matte · Ash Gray
-    { id: "wuestengelb",  name: "Wüstengelb",  hex: "#E8DBB7" }, // PLA Matte · Desert Tan
+    { id: "babyblau",     name: "Babyblau",    hex: "#A0D8F5" }, // PLA Pure  · Baby Blue    (Bambu #A4DBE8) · с фото
+    { id: "milchrosa",    name: "Milchrosa",   hex: "#ECBED2" }, // PLA Pure  · Milky Pink   (Bambu #F7CED7) · с фото
+    { id: "eisblau",      name: "Eisblau",     hex: "#8ECEDE" }, // PLA Matte · Ice Blue     (Bambu #A3D8E1) · оценка
+    { id: "sakurarosa",   name: "Sakura-Rosa", hex: "#DE97BF" }, // PLA Matte · Sakura Pink  (Bambu #E8AFCF) · оценка
+    { id: "aprikose",     name: "Aprikose",    hex: "#E9A155" }, // PLA Pure  · Apricot      (Bambu #FFB673) · с фото
+    { id: "fliederlila",  name: "Fliederlila", hex: "#9684E0" }, // PLA Matte · Lilac Purple (Bambu #AE96D4) · с фото
+    { id: "apfelgruen",   name: "Apfelgrün",   hex: "#B1D66B" }, // PLA Matte · Apple Green  (Bambu #C2E189) · оценка
+    { id: "aschgrau",     name: "Aschgrau",    hex: "#8291A8" }, // PLA Matte · Ash Gray     (Bambu #9B9EA0) · с фото
+    { id: "wuestengelb",  name: "Wüstengelb",  hex: "#B29C7A" }, // PLA Matte · Desert Tan   (Bambu #E8DBB7) · с фото
   ],
   defaultColor: "milchrosa",
 

@@ -40,25 +40,40 @@
      На телефоне — компактная полоса сверху, на компьютере — левая колонка. */
   .preview-col{position:sticky;top:0;z-index:20;margin:0 -16px;padding:8px 16px 10px;background:var(--bg)}
   .preview-col::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px;background:linear-gradient(var(--bg),rgba(251,246,240,0));pointer-events:none}
-  .stage{background:var(--wall);border-radius:18px;min-height:136px;display:flex;align-items:center;justify-content:center;padding:10px 10px 28px;position:relative;overflow:hidden}
-  .stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:14px;background:linear-gradient(transparent,rgba(0,0,0,.035));pointer-events:none}
-  .stage .note{position:absolute;left:8px;right:8px;bottom:5px;margin:0;z-index:1;font-size:11px;line-height:1.2;opacity:.85}
-  .livebar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 4px 0;font-size:14px;color:var(--muted)}
-  .livebar span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .livebar b{font-family:Fredoka,sans-serif;font-weight:600;font-size:18px;color:var(--ink);white-space:nowrap}
-  .letters{display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-end;gap:0;line-height:1;user-select:none}
-  /* Буквы — изображения из 3D-моделей: --img даёт форму и блики, --c — цвет */
-  .L{position:relative;display:inline-block;flex:none;width:calc(var(--w)*1em);height:calc(var(--h)*1em);cursor:pointer;
-     filter:drop-shadow(0 .03em .04em rgba(60,40,30,.22));transition:transform .15s}
+  /* Сцена: фото двери или стены, буквы стоят на ней в настоящем масштабе.
+     «Камера» — это размер и положение .world; --s = сколько пикселей экрана в одном пикселе фото. */
+  .scene{position:relative;overflow:hidden;border-radius:18px;background:#EDE7E0;aspect-ratio:3/2;isolation:isolate}
+  .world{position:absolute;left:0;top:0;transform-origin:0 0}
+  .world img{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .45s;user-select:none;-webkit-user-drag:none;pointer-events:none}
+  .scene[data-scene=tuer] #imgTuer,.scene[data-scene=wand] #imgWand{opacity:1}
+  .letters{position:absolute;left:calc(var(--s)*var(--ax)*1px);top:calc(var(--s)*var(--ay)*1px);transform:translate(-50%,-50%);
+     display:flex;flex-wrap:nowrap;align-items:flex-end;line-height:1;user-select:none;font-size:calc(var(--s)*var(--lh)*1px)}
+  /* Буквы — картинки из 3D-моделей: --img даёт форму, тени и блики, --c — цвет. Тень падает вправо вниз, как свет на фото */
+  .L{position:relative;display:block;flex:none;width:calc(var(--w)*1em);height:calc(var(--h)*1em);margin:0 .015em;cursor:pointer;rotate:var(--r,0deg);
+     filter:drop-shadow(.012em .02em .012em rgba(70,50,30,.42)) drop-shadow(.05em .075em .06em rgba(70,50,30,.26));transition:translate .15s}
   .L i{position:absolute;inset:0;background:var(--c);
      -webkit-mask:var(--img) center/100% 100% no-repeat;mask:var(--img) center/100% 100% no-repeat}
   .L i::after{content:"";position:absolute;inset:0;background:var(--img) center/100% 100% no-repeat;mix-blend-mode:hard-light}
-  .L.sel{transform:translateY(-6px)}
+  .L.sel{translate:0 -.07em}
+  .L.sel::after{content:"";position:absolute;left:22%;right:22%;bottom:-.12em;height:.05em;min-height:3px;border-radius:4px;background:var(--ink)}
+  /* новая буква «садится» на дверь */
+  .L.in{animation:drop .38s cubic-bezier(.2,.9,.3,1.2) both}
+  @keyframes drop{0%{opacity:0;scale:.6;translate:0 -.14em}100%{opacity:1;scale:1;translate:0 0}}
   /* короткая «пружинка» на букве, у которой только что сменился цвет */
   .L.pop i{transform-origin:50% 100%;animation:pop .3s ease-out}
   @keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
-  @media (prefers-reduced-motion:reduce){.L.pop i{animation:none}.L,.pay{transition:none}}
-  .L.sel::after{content:"";position:absolute;left:20%;right:20%;bottom:-.09em;height:4px;border-radius:4px;background:var(--ink)}
+  @media (prefers-reduced-motion:reduce){.L.pop i,.L.in{animation:none}.L,.pay{transition:none}.world img{transition:none}}
+  .scene-tabs{position:absolute;left:8px;top:8px;z-index:2;display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.86);box-shadow:0 1px 5px rgba(60,40,30,.16)}
+  .scene-tabs button{border:0;background:none;font:700 13px Nunito,sans-serif;color:var(--ink);padding:7px 13px;border-radius:999px;cursor:pointer}
+  .scene-tabs button[aria-pressed=true]{background:var(--ink);color:#fff}
+  .zoom{position:absolute;right:8px;top:8px;z-index:2;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.86);box-shadow:0 1px 5px rgba(60,40,30,.16);color:var(--ink);cursor:pointer;display:grid;place-items:center;padding:0}
+  .zoom svg{width:18px;height:18px}
+  .scene .note{position:absolute;left:8px;bottom:7px;z-index:2;margin:0;max-width:calc(100% - 16px);text-align:left;font-size:11px;line-height:1.25;color:var(--ink);background:rgba(255,255,255,.84);padding:3px 9px;border-radius:10px}
+  .scene .note.warn{background:#FFE9BF}
+  .scene .empty{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:2;white-space:nowrap;background:rgba(255,255,255,.88);padding:6px 14px;border-radius:999px;font-size:17px}
+  .livebar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 4px 0;font-size:14px;color:var(--muted)}
+  .livebar span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .livebar b{font-family:Fredoka,sans-serif;font-weight:600;font-size:18px;color:var(--ink);white-space:nowrap}
   .empty{color:var(--muted);font-family:Fredoka;font-size:20px}
   .note{font-size:13px;color:var(--muted);text-align:center;margin:8px 0 0}
 
@@ -133,8 +148,10 @@
     .builder{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:start}
     .preview-col{top:20px;margin:0;padding:0;background:none}
     .preview-col::after{display:none}
-    .stage{min-height:380px;border-radius:var(--radius);padding:28px 16px 40px}
-    .stage .note{bottom:12px;font-size:12px}
+    .scene{aspect-ratio:4/5;max-height:calc(100vh - 110px);border-radius:var(--radius)}
+    .scene .note{left:12px;bottom:12px;font-size:12px}
+    .scene-tabs{left:12px;top:12px}.zoom{right:12px;top:12px}
+    .scene-tabs button{font-size:14px;padding:8px 16px}
     .livebar{padding:12px 6px 0;font-size:15px}
     .controls-col>.card:first-child{margin-top:0}
     .facts{grid-template-columns:repeat(4,1fr)}
@@ -158,9 +175,20 @@
 
   <section id="konfigurator" class="builder">
     <div class="preview-col">
-      <div class="stage">
-        <div class="letters" id="preview" aria-live="polite"></div>
-        <p class="note" id="previewNote">Vorschau ungefähr – Farben können leicht abweichen.</p>
+      <div class="scene" id="scene" data-scene="tuer">
+        <div class="world" id="world">
+          <img id="imgTuer" src="scenes/tuer.webp" width="1086" height="1448" alt="Weiße Kinderzimmertür" decoding="async">
+          <img id="imgWand" data-src="scenes/wand.webp" width="1086" height="1448" alt="Helle Wand über einer Kommode im Kinderzimmer" decoding="async">
+          <div class="letters" id="preview" aria-live="polite"></div>
+        </div>
+        <div class="scene-tabs" role="group" aria-label="Wo sollen die Buchstaben hin?">
+          <button type="button" id="scTuer" aria-pressed="true">Tür</button>
+          <button type="button" id="scWand" aria-pressed="false">Wand</button>
+        </div>
+        <button type="button" class="zoom" id="zoomBtn" aria-label="Ganzen Raum zeigen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path id="zoomPlus" d="M10.5 7.8v5.4M7.8 10.5h5.4"/></svg>
+        </button>
+        <p class="note" id="previewNote">Vorschau</p>
       </div>
       <div class="livebar"><span id="liveCfg"></span><b id="liveTotal"></b></div>
     </div>
@@ -282,7 +310,68 @@ const $ = (id) => document.getElementById(id);
 const eur = (cents) => new Intl.NumberFormat("de-DE",{style:"currency",currency:CONFIG.currency.toUpperCase()}).format(cents/100);
 const colorById = (id) => CONFIG.colors.find(c => c.id === id);
 
-const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0, delivery: "dhl", zip: "" };
+const state = { text: "EVA", size: CONFIG.defaultSize, mode: "one", colors: [], sel: 0, delivery: "dhl", zip: "", scene: "tuer", zoom: false };
+
+// Сцены. Все числа — в пикселях фото (1086 × 1448). ax/ay — где висит середина имени,
+// ppc — сколько пикселей фото в одном сантиметре (дверь ≈ 86 см шириной), maxCm — сколько места в ряд.
+const IMG_W = 1086, IMG_H = 1448;
+const SCENES = {
+  tuer: { ax: 545, ay: 440, ppc: 6.5, maxCm: 80, wideCy: 590 },
+  wand: { ax: 520, ay: 545, ppc: 6.4, maxCm: 135, wideCy: 760 },
+};
+const noMotion = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+const sizeCm = () => parseFloat(CONFIG.sizes.find((x) => x.id === state.size).label) || 9;
+const nameEm = (t) => [...t].reduce((a, ch) => a + GLYPHS[ch].w + 0.03, 0);
+
+// Ставит «камеру»: общий вид комнаты или крупно на имя. Сначала раскладываем всё уже в новом масштабе
+// (в покое картинка без трансформаций — буквы чёткие), потом проигрываем плавный переход от старого вида.
+function camera(animate, ms = 900) {
+  const sc = SCENES[state.scene], el = $("scene"), world = $("world");
+  const Vw = el.clientWidth, Vh = el.clientHeight;
+  if (!Vw || !Vh) return;
+  const lh = sizeCm() * sc.ppc;
+  let vw = IMG_W, cx = IMG_W / 2, cy = sc.wideCy;
+  // крупный план: на телефоне ближе к буквам, на большом экране видно больше двери (ручку, комод)
+  const big = Vw >= 480;
+  if (state.zoom) { vw = Math.max(big ? 540 : 460, nameEm(state.text) * lh / 0.72); cx = sc.ax; cy = sc.ay + vw * Vh / Vw * (big ? 0.13 : 0.05); }
+  vw = Math.min(vw, IMG_W, IMG_H * Vw / Vh);
+  const vh = vw * Vh / Vw;
+  cx = Math.min(IMG_W - vw / 2, Math.max(vw / 2, cx));
+  cy = Math.min(IMG_H - vh / 2, Math.max(vh / 2, cy));
+  const S = Vw / vw;
+  const first = world.getBoundingClientRect();
+  world.style.transition = "none"; world.style.transform = "none";
+  world.style.width = IMG_W * S + "px"; world.style.height = IMG_H * S + "px";
+  world.style.left = (Vw / 2 - cx * S) + "px"; world.style.top = (Vh / 2 - cy * S) + "px";
+  world.style.setProperty("--s", S); world.style.setProperty("--ax", sc.ax); world.style.setProperty("--ay", sc.ay); world.style.setProperty("--lh", lh);
+  const last = world.getBoundingClientRect();
+  const moved = Math.abs(first.width - last.width) > 0.5 || Math.abs(first.left - last.left) > 0.5 || Math.abs(first.top - last.top) > 0.5;
+  if (animate && !noMotion && first.width && moved) {
+    world.style.transform = `translate(${first.left - last.left}px,${first.top - last.top}px) scale(${first.width / last.width})`;
+    world.getBoundingClientRect();
+    world.style.transition = `transform ${ms}ms cubic-bezier(.22,.8,.2,1)`;
+    world.style.transform = "none";
+  }
+  $("zoomBtn").setAttribute("aria-label", state.zoom ? "Ganzen Raum zeigen" : "Näher heran");
+  $("zoomPlus").setAttribute("d", state.zoom ? "M7.8 10.5h5.4" : "M10.5 7.8v5.4M7.8 10.5h5.4");
+}
+
+let zoomTimer = 0;
+function zoomInSoon(delay) { clearTimeout(zoomTimer); zoomTimer = setTimeout(() => { state.zoom = true; camera(true, 1300); }, delay); }
+function setScene(id) {
+  if (state.scene === id) return;
+  state.scene = id; track("Szene gewaehlt", { szene: id });
+  const w = $("imgWand"); if (w.dataset.src) { w.src = w.dataset.src; delete w.dataset.src; }
+  $("scene").dataset.scene = id;
+  $("scTuer").setAttribute("aria-pressed", id === "tuer"); $("scWand").setAttribute("aria-pressed", id === "wand");
+  // сначала общий вид новой комнаты, потом камера подъезжает к имени
+  state.zoom = false; render(false); zoomInSoon(550);
+}
+$("scTuer").onclick = () => setScene("tuer");
+$("scWand").onclick = () => setScene("wand");
+$("zoomBtn").onclick = () => { clearTimeout(zoomTimer); state.zoom = !state.zoom; camera(true, 900); };
+// фото стены подгружаем заранее, но после всего остального
+window.addEventListener("load", () => setTimeout(() => { const w = $("imgWand"); if (w.dataset.src) { w.src = w.dataset.src; delete w.dataset.src; } }, 1200));
 
 // Текущая сумма заказа для событий Meta (в евро, с доставкой)
 function orderValue() {
@@ -344,6 +433,7 @@ $("name").addEventListener("input", (e) => {
   state.text = t;
   if (t.length && !fired.has("meta:customize")) { fired.add("meta:customize"); metaTrack("CustomizeProduct", orderValue()); }
   if (state.sel >= t.length) state.sel = Math.max(0, t.length - 1);
+  clearTimeout(zoomTimer); state.zoom = true;
   if (e.target.value !== t) {
     const pos = e.target.selectionStart;
     e.target.value = t;
@@ -363,38 +453,41 @@ $("mix").onclick = () => {
   render();
 };
 
-function render(){
+let shownText = null;
+function render(animate = true){
   const t = state.text, n = t.length;
-  // preview
+  // preview: буквы на двери или стене
   const pv = $("preview");
   pv.innerHTML = "";
-  if (!n) pv.innerHTML = `<span class="empty">Gib einen Namen ein ✏️</span>`;
-  const stageW = Math.min(pv.parentElement.clientWidth - 20, 528);
-  // на телефоне превью компактная (она закреплена сверху), на компьютере — крупная
-  const cap = window.matchMedia("(min-width:900px)").matches ? 150 : 78;
-  const fs = Math.max(30, Math.min(cap, stageW / (Math.max(n,3) * 0.9)));
-  pv.style.fontSize = fs + "px";
+  $("scene").querySelector(".empty")?.remove();
+  if (!n) { const e = document.createElement("span"); e.className = "empty"; e.textContent = "Gib einen Namen ein ✏️"; $("scene").appendChild(e); }
   pv.setAttribute("aria-label", t);
+  const grown = shownText !== null && t.length > shownText.length && t.startsWith(shownText) ? shownText.length : Infinity;
   [...t].forEach((ch, i) => {
     const s = document.createElement("span");
     const c = colorById(state.colors[i]);
     const g = GLYPHS[ch];
-    s.className = "L" + (state.mode === "each" && i === state.sel ? " sel" : "") + (state.pop?.includes(i) ? " pop" : "");
+    s.className = "L" + (state.mode === "each" && i === state.sel ? " sel" : "") + (state.pop?.includes(i) ? " pop" : "") + (i >= grown ? " in" : "");
     s.dataset.l = ch;
     s.setAttribute("aria-hidden", "true");
     s.style.setProperty("--c", c.hex);
     s.style.setProperty("--w", g.w);
     s.style.setProperty("--h", g.h);
+    s.style.setProperty("--r", (((i * 7 + ch.charCodeAt(0)) % 5) - 2) * 0.45 + "deg"); // чуть неровно, как наклеено рукой
     s.style.setProperty("--img", `url("letters/${ch}.webp")`);
     s.appendChild(document.createElement("i"));
     s.onclick = () => { if (state.mode === "one") { state.mode = "each"; } state.sel = i; render(); };
     pv.appendChild(s);
   });
-  // если не помещается — уменьшаем
-  let guard = 0;
-  while (n && pv.scrollWidth > stageW && guard++ < 40) {
-    pv.style.fontSize = (parseFloat(pv.style.fontSize) * 0.95) + "px";
-  }
+  shownText = t;
+  // подпись: настоящая ширина имени и подсказка, если на дверь в один ряд не помещается
+  const cm = Math.round(nameEm(t) * sizeCm()), sc = SCENES[state.scene], note = $("previewNote");
+  const tooWide = n && cm > sc.maxCm;
+  note.className = "note" + (tooWide ? " warn" : "");
+  note.textContent = !n ? "Vorschau" : tooWide
+    ? (state.scene === "tuer" ? `Ca. ${cm} cm breit – das passt nicht in eine Reihe auf die Tür. Nimm kleinere Buchstaben oder die Wand.` : `Ca. ${cm} cm breit – dafür brauchst du eine breite Wand.`)
+    : `Vorschau · ca. ${cm} cm breit`;
+  camera(animate, 600);
 
   $("count").textContent = `${n} / ${CONFIG.maxLetters} Buchstaben`;
   document.querySelectorAll("#sizes .opt").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === state.size));
@@ -463,9 +556,14 @@ window.addEventListener("pageshow", (e) => {
   if (e.persisted) { track("Zurueck von Stripe"); $("pay").textContent = "Zahlungspflichtig bestellen"; $("pay").disabled = !state.text.length; }
 });
 
-window.addEventListener("resize", render);
-document.fonts?.ready.then(render);
-render();
+window.addEventListener("resize", () => render(false));
+document.fonts?.ready.then(() => render(false));
+render(false);
+// Первый показ: сначала видна комната целиком, затем камера подъезжает к имени
+if ("IntersectionObserver" in window && !noMotion) {
+  const io = new IntersectionObserver((en) => { if (en.some((x) => x.isIntersecting)) { io.disconnect(); if (!state.zoom) zoomInSoon(700); } }, { threshold: 0.6 });
+  io.observe($("scene"));
+} else { state.zoom = true; camera(false); }
 
 // Was sehen Besucher überhaupt? (einmalig pro Besuch)
 if ("IntersectionObserver" in window) {
